@@ -42428,12 +42428,13 @@ async function loadProjectConfig(cwd, easEnvironment) {
             cwd,
             silent: !(0, core_1.isDebug)(),
         }));
-        // Look for a line starting with [stdout] (this means it got executed with eas env:exec)
+        // Look for all lines starting with [stdout] and join them (this means it got executed with eas env:exec)
         const lines = stdout.split('\n');
-        const stdoutLine = lines.find(line => line.startsWith('[stdout]'));
-        if (stdoutLine) {
-            // Remove [stdout] prefix and trim whitespace
-            stdout = stdoutLine.replace(/^\[stdout\]/, '').trim();
+        const stdoutLines = lines
+            .filter(line => line.startsWith('[stdout]'))
+            .map(line => line.replace(/^\[stdout\]/, '').trim());
+        if (stdoutLines.length > 0) {
+            stdout = stdoutLines.join('');
         }
     }
     catch (error) {
@@ -44594,26 +44595,24 @@ async function continuousDeployFingerprintAction(input = collectContinuousDeploy
         return (0, core_1.setFailed)(`Missing 'extra.eas.projectId' in app.json or app.config.js.`);
     }
     const platformsToRun = input.platform === 'all' ? new Set(['ios', 'android']) : new Set([input.platform]);
-    const [androidBuildRunInfo, iosBuildRunInfo] = await Promise.all([
-        platformsToRun.has('android')
-            ? buildForPlatformIfNecessaryAsync({
-                platform: 'android',
-                profile: input.profile,
-                workingDirectory: input.workingDirectory,
-                isInPullRequest,
-                environment: input.environment,
-            })
-            : null,
-        platformsToRun.has('ios')
-            ? buildForPlatformIfNecessaryAsync({
-                platform: 'ios',
-                profile: input.profile,
-                workingDirectory: input.workingDirectory,
-                isInPullRequest,
-                environment: input.environment,
-            })
-            : null,
-    ]);
+    const androidBuildRunInfo = platformsToRun.has('android')
+        ? await buildForPlatformIfNecessaryAsync({
+            platform: 'android',
+            profile: input.profile,
+            workingDirectory: input.workingDirectory,
+            isInPullRequest,
+            environment: input.environment,
+        })
+        : null;
+    const iosBuildRunInfo = platformsToRun.has('ios')
+        ? await buildForPlatformIfNecessaryAsync({
+            platform: 'ios',
+            profile: input.profile,
+            workingDirectory: input.workingDirectory,
+            isInPullRequest,
+            environment: input.environment,
+        })
+        : null;
     (0, core_1.info)(`Publishing EAS Update...`);
     const updates = await publishEASUpdatesAsync({
         cwd: input.workingDirectory,
@@ -44713,12 +44712,13 @@ async function getFingerprintHashForPlatformAsync({ cwd, platform, environment, 
             cwd,
             silent: !(0, core_1.isDebug)(),
         });
-        // Look for a line starting with [stdout] (this means it got executed with eas env:exec)
+        // Look for all lines starting with [stdout] and join them (this means it got executed with eas env:exec)
         const lines = stdout.split('\n');
-        const stdoutLine = lines.find(line => line.startsWith('[stdout]'));
-        if (stdoutLine) {
-            // Remove [stdout] prefix and trim whitespace
-            stdout = stdoutLine.replace(/^\[stdout\]/, '').trim();
+        const stdoutLines = lines
+            .filter(line => line.startsWith('[stdout]'))
+            .map(line => line.replace(/^\[stdout\]/, '').trim());
+        if (stdoutLines.length > 0) {
+            stdout = stdoutLines.join('');
         }
         const { hash } = JSON.parse(stdout);
         if (!hash || typeof hash !== 'string') {

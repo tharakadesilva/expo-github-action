@@ -42640,12 +42640,13 @@ async function loadProjectConfig(cwd, easEnvironment) {
             cwd,
             silent: !(0, core_1.isDebug)(),
         }));
-        // Look for a line starting with [stdout] (this means it got executed with eas env:exec)
+        // Look for all lines starting with [stdout] and join them (this means it got executed with eas env:exec)
         const lines = stdout.split('\n');
-        const stdoutLine = lines.find(line => line.startsWith('[stdout]'));
-        if (stdoutLine) {
-            // Remove [stdout] prefix and trim whitespace
-            stdout = stdoutLine.replace(/^\[stdout\]/, '').trim();
+        const stdoutLines = lines
+            .filter(line => line.startsWith('[stdout]'))
+            .map(line => line.replace(/^\[stdout\]/, '').trim());
+        if (stdoutLines.length > 0) {
+            stdout = stdoutLines.join('');
         }
     }
     catch (error) {
