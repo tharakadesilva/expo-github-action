@@ -90096,6 +90096,13 @@ async function loadProjectConfig(cwd, easEnvironment) {
             cwd,
             silent: !(0, core_1.isDebug)(),
         }));
+        // Look for a line starting with [stdout] (this means it got executed with eas env:exec)
+        const lines = stdout.split('\n');
+        const stdoutLine = lines.find(line => line.startsWith('[stdout]'));
+        if (stdoutLine) {
+            // Remove [stdout] prefix and trim whitespace
+            stdout = stdoutLine.replace(/^\[stdout\]/, '').trim();
+        }
     }
     catch (error) {
         throw new Error(`Could not fetch the project info from ${cwd}`, { cause: error });
