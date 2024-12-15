@@ -31,23 +31,21 @@ export async function setupAction(input = setupInput()) {
     await group(message, () => installCli('expo-cli', version, input.packager, input.expoCache));
   }
 
-  if (!input.easVersion) {
-    info(`Skipped installing eas-cli: 'eas-version' not provided.`);
-  } else {
-    const version = await resolvePackage('eas-cli', input.easVersion);
-    const message = input.easCache
-      ? `Installing eas-cli (${version}) from cache or with ${input.packager}`
-      : `Installing eas-cli (${version}) with ${input.packager}`;
+  // if (!input.easVersion) {
+  //   info(`Skipped installing eas-cli: 'eas-version' not provided.`);
+  // } else {
+  //   const version = await resolvePackage('eas-cli', input.easVersion);
+  //   const message = input.easCache
+  //     ? `Installing eas-cli (${version}) from cache or with ${input.packager}`
+  //     : `Installing eas-cli (${version}) with ${input.packager}`;
 
-    await group(message, () => installCli('eas-cli', version, input.packager, input.easCache));
-  }
+  //   await group(message, () => installCli('eas-cli', version, input.packager, input.easCache));
+  // }
 
   if (!input.token) {
     info(`Skipped authentication: 'token' not provided.`);
   } else {
-    await group('Validating authenticated account', () =>
-      authenticate(input.token, input.easVersion ? 'eas' : input.expoVersion ? 'expo' : undefined)
-    );
+    await group('Validating authenticated account', () => authenticate(input.token, 'eas'));
   }
 
   if (!input.patchWatchers) {
