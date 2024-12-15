@@ -211,6 +211,7 @@ async function getFingerprintHashForPlatformAsync({
 
     let commandLine: string;
     let args: string[];
+    environment = null;
     if (environment) {
       commandLine = await which('eas', true);
       const commandToExecute = ['npx', ...baseArguments].join(' ').replace(/"/g, '\\"');

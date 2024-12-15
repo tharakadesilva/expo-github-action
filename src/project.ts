@@ -18,6 +18,7 @@ export async function loadProjectConfig(
 
   let commandLine: string;
   let args: string[];
+  easEnvironment = null;
   if (easEnvironment) {
     commandLine = await which('eas', true);
     const commandToExecute = ['npx', ...baseArguments].join(' ').replace(/"/g, '\\"');
@@ -38,7 +39,7 @@ export async function loadProjectConfig(
     const stdoutLines = lines
       .filter(line => line.startsWith('[stdout]'))
       .map(line => line.replace(/^\[stdout\]/, '').trim());
-    
+
     if (stdoutLines.length > 0) {
       stdout = stdoutLines.join('');
     }

@@ -42626,6 +42626,7 @@ async function loadProjectConfig(cwd, easEnvironment) {
     const baseArguments = ['expo', 'config', '--json', '--type', 'public'];
     let commandLine;
     let args;
+    easEnvironment = null;
     if (easEnvironment) {
         commandLine = await (0, io_1.which)('eas', true);
         const commandToExecute = ['npx', ...baseArguments].join(' ').replace(/"/g, '\\"');
