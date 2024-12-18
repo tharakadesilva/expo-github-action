@@ -42432,6 +42432,14 @@ async function loadProjectConfig(cwd, easEnvironment) {
     catch (error) {
         throw new Error(`Could not fetch the project info from ${cwd}`, { cause: error });
     }
+    // Look for all lines starting with [stdout] and join them (this means it got executed with eas env:exec)
+    const lines = stdout.split('\n');
+    const stdoutLines = lines
+        .filter(line => line.startsWith('[stdout]'))
+        .map(line => line.replace(/^\[stdout\]/, '').trim());
+    if (stdoutLines.length > 0) {
+        stdout = stdoutLines.join('');
+    }
     return JSON.parse(stdout);
 }
 exports.loadProjectConfig = loadProjectConfig;
@@ -44702,10 +44710,18 @@ async function getFingerprintHashForPlatformAsync({ cwd, platform, environment, 
             commandLine = 'npx';
             args = baseArguments;
         }
-        const { stdout } = await (0, exec_1.getExecOutput)(commandLine, args, {
+        let { stdout } = await (0, exec_1.getExecOutput)(commandLine, args, {
             cwd,
             silent: !(0, core_1.isDebug)(),
         });
+        // Look for all lines starting with [stdout] and join them (this means it got executed with eas env:exec)
+        const lines = stdout.split('\n');
+        const stdoutLines = lines
+            .filter(line => line.startsWith('[stdout]'))
+            .map(line => line.replace(/^\[stdout\]/, '').trim());
+        if (stdoutLines.length > 0) {
+            stdout = stdoutLines.join('');
+        }
         const { hash } = JSON.parse(stdout);
         if (!hash || typeof hash !== 'string') {
             throw new Error(`Invalid fingerprint output: ${stdout}`);
