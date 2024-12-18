@@ -68,26 +68,24 @@ export async function continuousDeployFingerprintAction(
 
   const platformsToRun: Set<PlatformArg> =
     input.platform === 'all' ? new Set(['ios', 'android']) : new Set([input.platform]);
-  const [androidBuildRunInfo, iosBuildRunInfo] = await Promise.all([
-    platformsToRun.has('android')
-      ? buildForPlatformIfNecessaryAsync({
-          platform: 'android',
-          profile: input.profile,
-          workingDirectory: input.workingDirectory,
-          isInPullRequest,
-          environment: input.environment,
-        })
-      : null,
-    platformsToRun.has('ios')
-      ? buildForPlatformIfNecessaryAsync({
-          platform: 'ios',
-          profile: input.profile,
-          workingDirectory: input.workingDirectory,
-          isInPullRequest,
-          environment: input.environment,
-        })
-      : null,
-  ]);
+  const androidBuildRunInfo = platformsToRun.has('android')
+    ? await buildForPlatformIfNecessaryAsync({
+        platform: 'android',
+        profile: input.profile,
+        workingDirectory: input.workingDirectory,
+        isInPullRequest,
+        environment: input.environment,
+      })
+    : null;
+  const iosBuildRunInfo = platformsToRun.has('ios')
+    ? await buildForPlatformIfNecessaryAsync({
+        platform: 'ios',
+        profile: input.profile,
+        workingDirectory: input.workingDirectory,
+        isInPullRequest,
+        environment: input.environment,
+      })
+    : null;
 
   info(`Publishing EAS Update...`);
 

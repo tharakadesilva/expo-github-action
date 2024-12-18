@@ -44595,26 +44595,24 @@ async function continuousDeployFingerprintAction(input = collectContinuousDeploy
         return (0, core_1.setFailed)(`Missing 'extra.eas.projectId' in app.json or app.config.js.`);
     }
     const platformsToRun = input.platform === 'all' ? new Set(['ios', 'android']) : new Set([input.platform]);
-    const [androidBuildRunInfo, iosBuildRunInfo] = await Promise.all([
-        platformsToRun.has('android')
-            ? buildForPlatformIfNecessaryAsync({
-                platform: 'android',
-                profile: input.profile,
-                workingDirectory: input.workingDirectory,
-                isInPullRequest,
-                environment: input.environment,
-            })
-            : null,
-        platformsToRun.has('ios')
-            ? buildForPlatformIfNecessaryAsync({
-                platform: 'ios',
-                profile: input.profile,
-                workingDirectory: input.workingDirectory,
-                isInPullRequest,
-                environment: input.environment,
-            })
-            : null,
-    ]);
+    const androidBuildRunInfo = platformsToRun.has('android')
+        ? await buildForPlatformIfNecessaryAsync({
+            platform: 'android',
+            profile: input.profile,
+            workingDirectory: input.workingDirectory,
+            isInPullRequest,
+            environment: input.environment,
+        })
+        : null;
+    const iosBuildRunInfo = platformsToRun.has('ios')
+        ? await buildForPlatformIfNecessaryAsync({
+            platform: 'ios',
+            profile: input.profile,
+            workingDirectory: input.workingDirectory,
+            isInPullRequest,
+            environment: input.environment,
+        })
+        : null;
     (0, core_1.info)(`Publishing EAS Update...`);
     const updates = await publishEASUpdatesAsync({
         cwd: input.workingDirectory,
